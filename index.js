@@ -4,6 +4,4 @@ require('./bot/bot')
 const express = require('express');
 const dbConnect = require('./db/connect');
 
-const app = express();
-
 dbConnect()

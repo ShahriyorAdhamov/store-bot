@@ -1,6 +1,5 @@
 const bot = require("../bot");
-const User = require("../../model/user");
-const { text } = require("express");
+const User = require("../../models/user");
 
 async function start(msg) {
   const chatId = msg.chat.id;
@@ -52,6 +51,9 @@ async function requestContact(msg) {
             [
               {
                 text: 'Каталог'
+              },
+              user.admin && {
+                text: 'Пользователи'
               }
             ]
           ],
