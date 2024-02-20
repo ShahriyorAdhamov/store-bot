@@ -31,7 +31,7 @@ async function getAllCategories(chatId, page = 1) {
                             callback_data: 'prev_category'
                         },
                         {
-                            text: '1',
+                            text: page,
                             callback_data: 'page_number'
                         },
                         {
