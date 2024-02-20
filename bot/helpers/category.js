@@ -2,9 +2,10 @@ const bot = require('../bot');
 const User = require('../../models/user');
 const Category = require('../../models/category')
 
-async function getAllCategories(msg) {
-    const chatId = msg.chat.id;
-    const categoriesList = await Category.find();
+async function getAllCategories(chatId, page = 1) {
+    let limit = 5;
+    let skip = limit * (page - 1)
+    const categoriesList = await Category.find().skip(skip).limit(limit);
     const user = await User.findOne({ chatId });
     const categories = categoriesList.map(item => 
         {
@@ -78,11 +79,35 @@ async function newCategory(msg) {
                 action: 'category'
             }
         );
-        getAllCategories(msg);
+        getAllCategories(chatId);
 
     } else {
         bot.sendMessage(chatId, 'У вас нет прав на эту команду')
     }
 }
 
-module.exports = {getAllCategories, addCategory, newCategory}
+async function categoriesPagination(chatId, action) {
+    const user = await User.findOne({chatId});
+    if(user) {
+        let page = 1;
+        if(action === 'next_category') {
+            if(user.action.includes('category-page_')) {
+                page = user.action.split('_')[1];
+                page++;
+            } else {
+                user.action = `category-page_${page}`;
+            }
+        } else {
+            if (user.action.split('_')[1] > 0) {
+                page = user.action.split('_')[1];
+                page--;
+            }
+        }
+
+        user.action = `category-page_${page}`;
+        await user.save();
+        getAllCategories(chatId, page);
+    }
+}
+
+module.exports = {getAllCategories, addCategory, newCategory, categoriesPagination}
